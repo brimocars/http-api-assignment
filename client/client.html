@@ -1,13 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <title>Our simple HTTP server</title>
   <link rel="stylesheet" type="text/css" href="/style.css">
-  
-  <script>
 
+  <script>
+    function formatTitle(message) {
+      if (!message?.length) {
+        return undefined;
+      }
+      let formattedMessage = message.charAt(0).toUpperCase();
+      message = message.slice(1);
+      for (let i = 0; i < message.length; i++) {
+        if (message.charAt(i) === message.charAt(i).toUpperCase()) {
+          formattedMessage += ' ';
+        }
+        formattedMessage += message.charAt(i);
+      }
+      return formattedMessage;
+    }
+
+    window.onload = () => {
+      const sendButton = document.querySelector('#send');
+      sendButton.addEventListener('click', async (e) => {
+        const url = document.querySelector('#page').value;
+        const acceptType = document.querySelector('#type').value;
+
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            Accept: acceptType,
+          },
+        }); 
+
+        if (acceptType === 'application/json') {
+          const json = await response.json();
+          console.log(JSON.stringify(json));
+          
+          const title = document.querySelector('#title');
+          title.innerHTML = formatTitle(json.id) ?? 'Success';
+          
+          const message = document.querySelector('#message');
+          message.innerHTML = `Message: ${json.message}`;
+        } else {
+          const xml = await response.text();
+          console.log(xml);
+          const xmlDoc = new window.DOMParser().parseFromString(xml, 'text/xml');
+
+          const title = document.querySelector('#title');
+          title.innerHTML = formatTitle(xmlDoc.querySelector('id')?.innerHTML) ?? 'Success';
+          
+          const message = document.querySelector('#message');
+          message.innerHTML = `Message: ${xmlDoc.querySelector('message').innerHTML}`;
+        }
+      })
+    }
   </script>
 </head>
+
 <body>
   <section id="top">
     <h3>Status Code Tests</h3>
@@ -28,5 +79,8 @@
   </section>
   <section id="content">
   </section>
+  <h2 id="title"></h2>
+  <div id="message"></div>
 </body>
+
 </html>

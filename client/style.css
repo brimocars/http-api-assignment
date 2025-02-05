@@ -19,3 +19,12 @@ html, body {
   font-size: 2em;
   text-align: center;
 }
+
+h2 {
+  text-align: center;
+}
+
+div {
+  text-align: center;
+  font-size: large;
+}
